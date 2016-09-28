@@ -1,13 +1,17 @@
 #include <IRremote.h>
 #include "IRMessage.h"
 
+// PIN of ir receiver (IR emitter must be D3)
 int RECV_PIN = 2;
 
+// IR receiver object
 IRrecv irrecv(RECV_PIN);
 
+// Result of IR receiver
 decode_results results;
 
-Message m;
+// IRMessage
+IRMessage m;
 
 void setup() {
   Serial.begin(9600);
@@ -16,13 +20,13 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    m = Message();
+    m = IRMessage();
     m.decode(Serial.readString());
     delay(50);
     irrecv.enableIRIn();
   }
   else if (irrecv.decode(&results)) {
-    m = Message(&results);
+    m = IRMessage(&results);
     m.send();
     irrecv.resume();
   }

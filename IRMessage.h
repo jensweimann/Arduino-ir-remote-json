@@ -1,10 +1,10 @@
-#ifndef Message_h
-#define Message_h
+#ifndef IRMessage_h
+#define IRMessage_h
 
 #include <IRremote.h>
 #include <ArduinoJson.h>
 
-class Message
+class IRMessage
 {
   public:
     // Type of decode    
@@ -26,16 +26,10 @@ class Message
     IRsend irsend;
     
     // Simple constructor
-    Message();
-
-    // Constructor without address
-    Message(decode_type_t decode_type, unsigned long value, int rawlen);
-
-    // Constructor with address
-    Message(decode_type_t decode_type, unsigned long value, int rawlen, unsigned int address);
+    IRMessage();
 
     // Constructor with decode_results
-    Message(decode_results *results);
+    IRMessage(decode_results *results);
 
     // Send signal to Serial
     void send();

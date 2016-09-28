@@ -1,45 +1,36 @@
 #include "IRMessage.h"
 
-Message::Message() {
+// Simple constructor
+IRMessage::IRMessage() {
   
 }
 
-Message::Message(decode_type_t decode_type, unsigned long value, int rawlen) {
-  decode_type = decode_type;
-  value = value;
-  rawlen = rawlen;
-}
-
-Message::Message(decode_type_t decode_type, unsigned long value, int rawlen, unsigned int address) {
-  decode_type = decode_type;
-  value = value;
-  rawlen = rawlen;
-  address = address;
-}
-
-Message::Message(decode_results *results) {
+// Constructor with IRcode
+IRMessage::IRMessage(decode_results *results) {
   decode_type = results->decode_type;
   value = results->value;
-  Serial.println(results->value);
   rawlen = results->bits;
-  Serial.println(results->bits);
   address = results->address;
 }
 
-void Message::send() {
+// Send JsonObject to serial
+void IRMessage::send() {
   JsonObject& root = jsonBuffer.createObject();
   root["decode_type"] = (int) decode_type;
   root["value"] = value;
   root["rawlen"] = rawlen;
-    
+
+  // Only Panasonic have address
   if (decode_type == PANASONIC) {
     root["address"] = address;
   }
 
+  // Print json to serial
   root.printTo(Serial);
 }
 
-void Message::decode(String message) {
+// Decode json (from serial)
+void IRMessage::decode(String message) {
 
   // Convert message to char array
   int str_len = message.length() + 1;
@@ -49,19 +40,23 @@ void Message::decode(String message) {
   // Parse json
   JsonObject& root = jsonBuffer.parseObject(char_array);
 
+  // Set properties
   decode_type = (decode_type_t)(int) root["decode_type"];
   value = (unsigned long) root["value"];
   rawlen = (int) root["rawlen"];
   address = (unsigned int) root["address"];
 
+  // Send ir signal
   irSend();
 }
 
-void Message::irSend() {
+// Sending ir signal
+void IRMessage::irSend() {
   // If NEC
   if (decode_type == NEC) {
     irsend.sendNEC(value, rawlen);
   }
+  // If SAMSUNG
   else if (decode_type == SAMSUNG) {
     irsend.sendSAMSUNG(value, rawlen);
   }  
