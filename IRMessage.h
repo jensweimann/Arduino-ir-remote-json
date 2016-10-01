@@ -7,17 +7,14 @@
 class IRMessage
 {
   public:
-    // Type of decode    
-    decode_type_t decode_type;
-    
+    // Type of decode
+    int type;
+
     // Value of the signal
     unsigned long value;
 
-    // Rawlen
-    int rawlen;
-
-    // Adress, only for Panasonic & Sharp
-    unsigned int address;
+    // Number of bits
+    int bits;
 
     // JsonBuffer to create and parse Json
     StaticJsonBuffer<200> jsonBuffer;

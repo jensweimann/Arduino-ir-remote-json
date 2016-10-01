@@ -2,28 +2,24 @@
 
 // Simple constructor
 IRMessage::IRMessage() {
-  
+
 }
 
 // Constructor with IRcode
 IRMessage::IRMessage(decode_results *results) {
-  decode_type = results->decode_type;
+  type = results->decode_type;
   value = results->value;
-  rawlen = results->bits;
-  address = results->address;
+  bits = results->bits;
 }
 
 // Send JsonObject to serial
 void IRMessage::send() {
-  JsonObject& root = jsonBuffer.createObject();
-  root["decode_type"] = (int) decode_type;
-  root["value"] = value;
-  root["rawlen"] = rawlen;
 
-  // Only Panasonic have address
-  if (decode_type == PANASONIC) {
-    root["address"] = address;
-  }
+  // Creating Json Object
+  JsonObject& root = jsonBuffer.createObject();
+  root["type"] = type;
+  root["value"] = value;
+  root["bits"] = bits;
 
   // Print json to serial
   root.printTo(Serial);
@@ -41,10 +37,9 @@ void IRMessage::decode(String message) {
   JsonObject& root = jsonBuffer.parseObject(char_array);
 
   // Set properties
-  decode_type = (decode_type_t)(int) root["decode_type"];
+  type = (int) root["type"];
   value = (unsigned long) root["value"];
-  rawlen = (int) root["rawlen"];
-  address = (unsigned int) root["address"];
+  bits = (int) root["bits"];
 
   // Send ir signal
   irSend();
@@ -53,13 +48,13 @@ void IRMessage::decode(String message) {
 // Sending ir signal
 void IRMessage::irSend() {
   // If NEC
-  if (decode_type == NEC) {
-    irsend.sendNEC(value, rawlen);
+  if (type == NEC) {
+    irsend.sendNEC(value, bits);
   }
   // If SAMSUNG
-  else if (decode_type == SAMSUNG) {
-    irsend.sendSAMSUNG(value, rawlen);
-  }  
+  else if (type == SAMSUNG) {
+    irsend.sendSAMSUNG(value, bits);
+  }
 }
 
 
