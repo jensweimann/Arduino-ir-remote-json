@@ -51,6 +51,10 @@ void IRMessage::irSend() {
   if (type == NEC) {
     irsend.sendNEC(value, bits);
   }
+  // If Sony
+  if (type == SONY) {
+    irsend.sendSony(value, bits);
+  }
   // If SAMSUNG
   else if (type == SAMSUNG) {
     irsend.sendSAMSUNG(value, bits);
