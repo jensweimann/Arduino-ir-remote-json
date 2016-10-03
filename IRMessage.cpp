@@ -37,8 +37,11 @@ void IRMessage::send() {
   root["value"] = value;
   root["bits"] = bits;
 
-  for (int i = 0; i<=bits; i++) {
-    root["rawCodes"][i] = rawCodes[i];
+  // Send RawCodes if type == UNKNOWN
+  if (type == UNKNOWN) {
+    for (int i=0; i<bits; i++) {
+      root["rawCodes"][i] = rawCodes[i];
+    }
   }
 
   // Print json to serial
@@ -61,7 +64,12 @@ void IRMessage::decode(String message) {
   value = (unsigned long) root["value"];
   bits = (int) root["bits"];
 
-  for ()
+  // Decode Raw if type == UNKNOWN
+  if (type == UNKNOWN) {
+    for (int i=0; i<bits; i++) {
+      rawCodes[i] = (unsigned int) root["rawCodes"][i];
+    }
+  }
 
   // Send ir signal
   irSend();
@@ -106,6 +114,14 @@ void IRMessage::irSend() {
   // 7 == SAMSUNG
   else if (type == SAMSUNG) {
     irsend.sendSAMSUNG(value, bits);
+  }
+  // 8 == WHYNTER
+  else if (type == WHYNTER) {
+    irsend.sendWhynter(value, bits);
+  }
+  // 10 = LG
+  else if (type == LG) {
+    irsend.sendLG(value, bits);
   }
 }
 
