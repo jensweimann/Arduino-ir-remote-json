@@ -39,26 +39,26 @@ You can configure **IR receiver PIN** and **Serial Port**. Go to Arduino-ir-remo
 
 ### Type
 
-| Int   | Device                  | Test |
-|-------|-------------------------|------|
-| -1    | UNKNOW                  | N    |
-| 0     | UNUSED                  | N    |
-| 1     | RC5                     | N    |
-| 2     | RC6                     | N    |
-| 3     | NEC                     | Y    |
-| 4     | SONY                    | Y    |
-| 5     | PANASONIC               | N    |
-| 6     | JVC                     | N    |
-| 7     | SAMSUNG                 | Y    |
-| 8     | WHYNTER                 | N    |
-| 9     | AIWA_RC_T501            | N    |
-| 10    | LG                      | N    |
-| 11    | SANYO                   | N    |
-| 12    | MITSUBISHI              | N    |
-| 13    | DISH                    | N    |
-| 14    | SHARP                   | N    |
-| 15    | DENON                   | N    |
-| 16    | PRONTO                  | N    |
+| Int   | Device                  | Code  | Test  |
+|-------|-------------------------|-------|-------|
+| -1    | UNKNOW                  |   Y   |   N   |
+| 0     | UNUSED                  |   N   |   N   |
+| 1     | RC5                     |   Y   |   N   |
+| 2     | RC6                     |   Y   |   N   |
+| 3     | NEC                     |   Y   |   Y   |
+| 4     | SONY                    |   Y   |   Y   |
+| 5     | PANASONIC               |   Y   |   N   |
+| 6     | JVC                     |   Y   |   N   |
+| 7     | SAMSUNG                 |   Y   |   Y   |
+| 8     | WHYNTER                 |   Y   |   N   |
+| 9     | AIWA_RC_T501            |   N   |   N   |
+| 10    | LG                      |   Y   |   N   |
+| 11    | SANYO                   |   N   |   N   |
+| 12    | MITSUBISHI              |   N   |   N   |
+| 13    | DISH                    |   N   |   N   |
+| 14    | SHARP                   |   N   |   N   |
+| 15    | DENON                   |   N   |   N   |
+| 16    | PRONTO                  |   N   |   N   |
 
 
 
