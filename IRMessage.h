@@ -16,6 +16,12 @@ class IRMessage
     // Number of bits
     int bits;
 
+    // RawCodes for unknow devices
+    unsigned int rawCodes[RAWBUF];
+
+    // The RC5/6 toggle state
+    int toggle = 0;
+
     // JsonBuffer to create and parse Json
     StaticJsonBuffer<200> jsonBuffer;
 
