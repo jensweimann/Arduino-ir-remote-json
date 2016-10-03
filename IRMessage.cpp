@@ -94,6 +94,15 @@ void IRMessage::irSend() {
   else if (type == SONY) {
     irsend.sendSony(value, bits);
   }
+  // 5 == PANASONIC
+  else if (type == PANASONIC) {
+    irsend.sendPanasonic(value, bits);
+  }
+  // 6 == JVC
+  else if (type == JVC) {
+    // TODO : last param = repeat
+    irsend.sendJVC(value, bits, false);
+  }
   // 7 == SAMSUNG
   else if (type == SAMSUNG) {
     irsend.sendSAMSUNG(value, bits);
