@@ -39,8 +39,9 @@ void IRMessage::send() {
 
   // Send RawCodes if type == UNKNOWN
   if (type == UNKNOWN) {
+    JsonArray& data = root.createNestedArray("rawCodes");
     for (int i=0; i<bits; i++) {
-      root["rawCodes"][i] = rawCodes[i];
+      data.add(rawCodes[i]);
     }
   }
 
