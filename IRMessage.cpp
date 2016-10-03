@@ -123,6 +123,18 @@ void IRMessage::irSend() {
   else if (type == LG) {
     irsend.sendLG(value, bits);
   }
+  else {
+    sendError();
+  }
+}
+
+// Send an error
+void IRMessage::sendError() {
+  // Creating Json Object
+  JsonObject& root = jsonBuffer.createObject();
+  root["error"] = "Cannot send ir message";
+
+  root.printTo(Serial);
 }
 
 

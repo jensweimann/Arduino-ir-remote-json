@@ -43,6 +43,9 @@ class IRMessage
   private:
     // Send IR
     void irSend();
+
+    // Send Json Error
+    void sendError();
 };
 
 #endif
