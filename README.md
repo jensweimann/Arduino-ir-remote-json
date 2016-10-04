@@ -24,7 +24,7 @@ Only tested with Grove Sensors :
 
 ## Configuration
 
-You can configure **IR receiver PIN** and **Serial Port**. Go to Arduino-ir-remote.json and change it. 
+You can configure **IR receiver PIN** and **Serial Port**. Go to Arduino-ir-remote-json.ino and change : 
 
 
     // PIN of ir receiver (IR emitter must be D3)
