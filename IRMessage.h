@@ -46,6 +46,9 @@ class IRMessage
 
     // Send Json Error
     void sendError();
+
+    // Send json to serial
+    void printToSerial(char* json);
 };
 
 #endif

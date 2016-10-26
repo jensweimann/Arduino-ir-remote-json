@@ -46,7 +46,10 @@ void IRMessage::send() {
   }
 
   // Print json to serial
-  root.printTo(Serial);
+  char buffer[256];
+  root.printTo(buffer, sizeof(buffer));
+  
+  printToSerial(buffer);
 }
 
 // Decode json (from serial)
@@ -135,7 +138,15 @@ void IRMessage::sendError() {
   JsonObject& root = jsonBuffer.createObject();
   root["error"] = "Cannot send ir message";
 
-  root.printTo(Serial);
+  char buffer[256];
+  root.printTo(buffer, sizeof(buffer));
+  
+  printToSerial(buffer);
+}
+
+// Send json to serial
+void IRMessage::printToSerial(char* json) {
+  Serial.println(json);
 }
 
 
