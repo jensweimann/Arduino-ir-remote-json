@@ -1,0 +1,170 @@
+################## INPUT ##################
+input_boolean:
+  serial_sensor_code_enabled:
+
+sensor:
+  - platform: serial
+    name: serial_sensor
+    serial_port: !secret arduino_port
+
+  - platform: template
+    sensors:
+      serial_sensor_code:
+        entity_id: sensor.serial_sensor
+        value_template: >
+          {% set serialOutput =  states('sensor.serial_sensor') %}
+          {% if is_state('input_boolean.serial_sensor_code_enabled', 'on') and serialOutput != None and "value" in serialOutput %}
+            {{ (serialOutput|from_json).value }}
+          {% else %}
+            {{ None }}
+          {% endif %}
+
+automation:
+  - alias: serial_sensor_system_log
+    trigger:
+    - entity_id: sensor.serial_sensor
+      platform: state
+    condition:
+      condition: state
+      entity_id: input_boolean.serial_sensor_code_enabled
+      state: 'on'
+    action:
+    - service: system_log.write
+      data_template:
+        message: >
+          {{ trigger.to_state.state }}
+        level: warning
+
+  - alias: serial_sensor_livingroom_tv_proxy
+    trigger:
+      platform: state
+      entity_id: sensor.serial_sensor_code
+      to: "2704"
+    condition:
+      condition: state
+      entity_id: switch.livingroom_tv_proxy
+      state: 'off'
+    action:
+    - service: switch.turn_on
+      entity_id: switch.livingroom_tv_proxy
+
+  - alias: serial_sensor_sonoffs20no1
+    trigger:
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148500571"
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148467803"
+    action:
+    - service: homeassistant.toggle
+      entity_id: switch.sonoffs20no1
+
+  - alias: serial_sensor_livingroom_tv_light
+    trigger:
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148467804"
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148500572"
+    action:
+    - service: homeassistant.toggle
+      entity_id: light.livingroom_tv_light
+
+  - alias: serial_sensor_office_light
+    trigger:
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148500573"
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148467805"
+    action:
+    - service: homeassistant.toggle
+      entity_id: light.office_light
+
+  - alias: serial_sensor_bedroom_light
+    trigger:
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148500574"
+      - platform: state
+        entity_id: sensor.serial_sensor_code
+        to: "2148467806"
+    action:
+    - service: homeassistant.toggle
+      entity_id: light.bedroom_light
+
+################## OUTPUT ##################
+shell_command:
+  echo_line_to_sink: /bin/bash -c "echo -e -n '{{ line }}' > {{ sink }}"
+
+script:
+  write_code_to_serial_port:
+    alias: Write To Serial Port
+    sequence:
+    - service: shell_command.echo_line_to_sink
+      data_template:
+        line: "{{ code }}"
+        sink: !secret arduino_port
+
+  ir_tv_on:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":1872,"bits":12,"repeats":3}'
+
+  ir_tv_off:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":3920,"bits":12,"repeats":3}'
+
+  ir_tv_hdmi1:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":11608,"bits":15,"repeats":3}'
+
+  ir_tv_hdmi2:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":27992,"bits":15,"repeats":3}'
+
+  ir_tv_hdmi3:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":7512,"bits":15,"repeats":3}'
+
+  ir_tv_hdmi4:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":23896,"bits":15,"repeats":3}'
+
+  ir_tv_volume_up:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":1168,"bits":12,"repeats":3}'
+
+  ir_tv_volume_down:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":3216,"bits":12,"repeats":3}'
+
+  ir_tv_pause:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":19689,"bits":15,"repeats":3}'
+
+  ir_tv_play:
+    sequence:
+      - service: script.write_code_to_serial_port
+        data:
+          code: '{"type":4,"value":11497,"bits":15,"repeats":3}'

@@ -22,8 +22,7 @@ class IRMessage
     // The RC5/6 toggle state
     int toggle = 0;
 
-    // JsonBuffer to create and parse Json
-    StaticJsonBuffer<200> jsonBuffer;
+    int repeats = 1;
 
     // Object to send IR
     IRsend irsend;
@@ -40,15 +39,7 @@ class IRMessage
     // Decode signal and send IR
     void decode(String message);
 
-  private:
-    // Send IR
-    void irSend();
-
-    // Send Json Error
-    void sendError();
-
-    // Send json to serial
-    void printToSerial(char* json);
+    bool irSend();
 };
 
 #endif

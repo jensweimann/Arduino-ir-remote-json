@@ -10,18 +10,20 @@ IRMessage::IRMessage(decode_results *results) {
   type = results->decode_type;
 
   if (type == UNKNOWN) {
+    value = 0;
     bits = results->rawlen - 1;
     for (int i = 0; i <= bits; i++) {
       if (i % 2) {
         // Mark
-        rawCodes[i] = results->rawbuf[i]*USECPERTICK - MARK_EXCESS;
-      } 
+        rawCodes[i] = results->rawbuf[i] * USECPERTICK - MARK_EXCESS;
+      }
       else {
         // Space
-        rawCodes[i] = results->rawbuf[i]*USECPERTICK + MARK_EXCESS;
+        rawCodes[i] = results->rawbuf[i] * USECPERTICK + MARK_EXCESS;
       }
     }
   }
+  
   else {
     value = results->value;
     bits = results->bits;
@@ -31,6 +33,8 @@ IRMessage::IRMessage(decode_results *results) {
 // Send JsonObject to serial
 void IRMessage::send() {
 
+  // JsonBuffer to create and parse Json
+  StaticJsonBuffer<256> jsonBuffer;
   // Creating Json Object
   JsonObject& root = jsonBuffer.createObject();
   root["type"] = type;
@@ -40,16 +44,12 @@ void IRMessage::send() {
   // Send RawCodes if type == UNKNOWN
   if (type == UNKNOWN) {
     JsonArray& data = root.createNestedArray("rawCodes");
-    for (int i=0; i<bits; i++) {
+    for (int i = 0; i < bits; i++) {
       data.add(rawCodes[i]);
     }
   }
-
-  // Print json to serial
-  char buffer[256];
-  root.printTo(buffer, sizeof(buffer));
-  
-  printToSerial(buffer);
+  root.printTo(Serial);
+  Serial.println();
 }
 
 // Decode json (from serial)
@@ -60,27 +60,48 @@ void IRMessage::decode(String message) {
   char char_array[str_len];
   message.toCharArray(char_array, str_len);
 
+  // JsonBuffer to create and parse Json
+  StaticJsonBuffer<256> jsonBuffer;
   // Parse json
   JsonObject& root = jsonBuffer.parseObject(char_array);
+
+  if (!root.success()) {
+    Serial.println("{\"error\":\"decoding failed\"}");
+    return;
+  }
 
   // Set properties
   type = (int) root["type"];
   value = (unsigned long) root["value"];
   bits = (int) root["bits"];
+  repeats = (int) root["repeats"];
 
+  if (repeats == 0) {
+    repeats = 1;
+  }
   // Decode Raw if type == UNKNOWN
   if (type == UNKNOWN) {
-    for (int i=0; i<bits; i++) {
+    for (int i = 0; i < bits; i++) {
       rawCodes[i] = (unsigned int) root["rawCodes"][i];
     }
   }
 
+  bool proceed = true;
   // Send ir signal
-  irSend();
+  for (int i = 0; i < repeats; i++) {
+    if (proceed) {
+      proceed = irSend();
+      delay(40);
+    }
+  }
+  root["sent"] = proceed;
+  root["repeats"] = repeats;
+  root.printTo(Serial);
+  Serial.println();
 }
 
 // Sending ir signal
-void IRMessage::irSend() {
+bool IRMessage::irSend() {
 
   // -1 == UNKNOW
   if (type == UNKNOWN) {
@@ -93,7 +114,7 @@ void IRMessage::irSend() {
     value = value | (toggle << (bits - 1));
     if (type == RC5) {
       irsend.sendRC5(value, bits);
-    } 
+    }
     else {
       irsend.sendRC6(value, bits);
     }
@@ -128,26 +149,7 @@ void IRMessage::irSend() {
     irsend.sendLG(value, bits);
   }
   else {
-    sendError();
+    return false;
   }
+  return true;
 }
-
-// Send an error
-void IRMessage::sendError() {
-  // Creating Json Object
-  JsonObject& root = jsonBuffer.createObject();
-  root["error"] = "Cannot send ir message";
-
-  char buffer[256];
-  root.printTo(buffer, sizeof(buffer));
-  
-  printToSerial(buffer);
-}
-
-// Send json to serial
-void IRMessage::printToSerial(char* json) {
-  Serial.println(json);
-}
-
-
-
